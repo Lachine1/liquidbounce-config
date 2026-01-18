@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InkMC V2 Beta - Weryfikacja</title>
+    <style>
+        /* Import czcionek */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #050505;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: white;
+            position: relative;
+        }
+
+        /* Tło */
+        .background {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #111 0%, #000 100%);
+            z-index: -2;
+        }
+
+        .orb {
+            position: absolute;
+            width: 500px; height: 500px;
+            background: #00f2ff;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.3;
+            z-index: -1;
+            animation: pulse 8s infinite alternate;
+        }
+
+        /* Główna Karta */
+        .card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            padding: 40px;
+            border-radius: 20px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            z-index: 1;
+        }
+
+        h1 {
+            font-weight: 800;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, #fff, #00f2ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        p.sub { color: #888; font-size: 0.9rem; margin-bottom: 30px; }
+
+        /* Przycisk Główny */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background: rgba(0, 242, 255, 0.1);
+            border-color: #00f2ff;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+        }
+
+        /* --- OVERLAY (Wyskakujące okno) --- */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .overlay.active { opacity: 1; pointer-events: all; }
+
+        .modal {
+            background: #151515;
+            border: 1px solid #00f2ff;
+            padding: 25px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .overlay.active .modal { transform: scale(1); }
+
+        .modal h2 { color: #00f2ff; text-transform: uppercase; font-size: 1.2rem; margin-bottom: 10px; }
+        
+        .instructions {
+            text-align: left;
+            font-size: 0.9rem;
+            color: #ddd;
+            line-height: 1.6;
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .highlight { color: #ffeb3b; font-weight: bold; }
+        .danger { color: #ff4444; font-weight: bold; }
+
+        /* Wideo w modalu */
+        .video-wrapper {
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #333;
+            margin-top: 5px;
+            background: #000;
+        }
+        
+        video {
+            width: 100%;
+            display: block;
+        }
+
+        .btn-close {
+            background: linear-gradient(90deg, #00f2ff, #0061ff);
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            color: #000;
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .btn-close:hover { transform: scale(1.02); }
+
+        @keyframes pulse { 0% { opacity: 0.2; } 100% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+
+    <div class="background"></div>
+    <div class="orb"></div>
+
+    <!-- OVERLAY (Wyskakujące okno z instrukcją i filmem) -->
+    <div class="overlay" id="infoOverlay">
+        <div class="modal">
+            <h2>⚠️ Instrukcja Weryfikacji</h2>
+            
+            <div class="instructions">
+                1. <span class="danger">Zamykaj wszystkie reklamy</span> i nowe karty, które wyskoczą.<br>
+                2. Klikaj przyciski: <span class="highlight">"Continue"</span> oraz <span class="highlight">"Get Link"</span>.<br>
+                3. Na ostatniej stronie wykonaj to, co na filmie:
+            </div>
+
+            <div class="video-wrapper">
+                <!-- Uwaga: Autoplay działa zazwyczaj tylko gdy wideo jest wyciszone (muted) -->
+                <video autoplay loop muted playsinline>
+                    <source src="https://lachine1.github.io/liquidbounce-config/catlean/2026-01-18%2022-36-27.mkv" type="video/mp4">
+                    <source src="https://lachine1.github.io/liquidbounce-config/catlean/2026-01-18%2022-36-27.mkv" type="video/webm">
+                    <source src="https://lachine1.github.io/liquidbounce-config/catlean/2026-01-18%2022-36-27.mkv" type="video/x-matroska">
+                    Twoja przeglądarka nie wspiera tego formatu wideo.
+                </video>
+            </div>
+
+            <button class="btn-close" onclick="closeOverlay()">Rozumiem, przejdź dalej</button>
+        </div>
+    </div>
+
+    <!-- Główna karta -->
+    <div class="card">
+        <h1>InkMC V2 Beta</h1>
+        <p class="sub">CatLean Config Downloader</p>
+
+        <button class="btn" id="actionBtn" onclick="handleAction()">
+            Rozpocznij
+        </button>
+    </div>
+
+    <script>
+        let step = 1;
+        const TARGET_LINK = "https://oii.la/T6TK9yOyj";
+
+        function handleAction() {
+            if (step === 1) {
+                // KROK 1: Pokaż ostrzeżenie (overlay)
+                document.getElementById('infoOverlay').classList.add('active');
+            } else {
+                // KROK 3: Przekierowanie
+                window.location.href = TARGET_LINK;
+            }
+        }
+
+        function closeOverlay() {
+            // KROK 2: Zamknięcie ostrzeżenia i zmiana przycisku
+            document.getElementById('infoOverlay').classList.remove('active');
+            
+            const btn = document.getElementById('actionBtn');
+            btn.innerText = "🔗 Przejdź do strony docelowej";
+            btn.style.borderColor = "#00f2ff";
+            btn.style.background = "rgba(0, 242, 255, 0.1)";
+            
+            step = 2; // Gotowy do przekierowania
+        }
+    </script>
+
+</body>
+</html>
